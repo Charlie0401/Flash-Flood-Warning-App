@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Residents</title>
+<style>
+  :root{
+    --ink:#1B2430; --ink-soft:#4C5666; --paper:#F2EFE8; --card:#FFFFFF; --line:#DCD7CB;
+    --alert:#B3311F; --alert-tint:#FBE9E6; --brand:#2C5F73; --brand-tint:#E3EEF1;
+    --up:#C1481E; --down:#3060B0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --ink:#ECE7DC; --ink-soft:#B9B2A2; --paper:#181613; --card:#221F1A; --line:#38342C; --alert-tint:#301613; --brand-tint:#132A32; }
+  }
+  :root[data-theme="dark"]{ --ink:#ECE7DC; --ink-soft:#B9B2A2; --paper:#181613; --card:#221F1A; --line:#38342C; --alert-tint:#301613; --brand-tint:#132A32; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
+  .frame{max-width:460px;margin:0 auto;min-height:100vh;background:var(--paper); border-left:1px solid var(--line); border-right:1px solid var(--line);}
+
+  .topbar{position:sticky; top:0; z-index:5; padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px; background:var(--paper); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
+  .topbar h1{margin:0; font-size:19px; font-weight:800; letter-spacing:.2px; flex:1;}
+  .backbtn{background:none; border:none; cursor:pointer; color:var(--ink); padding:2px; display:flex;}
+  .backbtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+
+  .section-label{padding:20px 20px 6px; font-size:13px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
+
+  /* Active warning */
+  .warning{margin:10px 16px 4px; border-radius:10px; background:var(--alert-tint); border:1px solid var(--alert); overflow:hidden;}
+  .warning-head{display:flex; align-items:center; gap:10px; padding:14px 16px 10px; color:var(--alert);}
+  .warning-head .who{font-size:20px; font-weight:800; letter-spacing:.02em;}
+  .warning-sub{padding:0 16px 4px; font-size:12.5px; color:var(--ink-soft); font-weight:600; display:flex; justify-content:space-between;}
+  .warning-body{padding:6px 16px 16px; font-size:14.5px; line-height:1.55;}
+  .warning-body p{margin:0 0 10px;} .warning-body p:last-child{margin-bottom:0;}
+  .warning-foot{display:flex; justify-content:flex-end; padding:0 16px 14px;}
+  .btn-read{border:none; border-radius:7px; padding:8px 14px; font-size:13.5px; font-weight:700; background:var(--alert); color:#fff; cursor:pointer;}
+  .btn-read:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+
+  /* Collapsed notice rows */
+  .noticelist{margin:6px 16px 0;}
+  .noticerow{background:var(--card); border:1px solid var(--line); border-radius:9px; margin-bottom:8px; overflow:hidden;}
+  .noticerow-head{display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; background:none; border:none; width:100%; text-align:left; font:inherit; color:inherit;}
+  .noticerow-head .tag{width:8px; height:8px; border-radius:50%; background:var(--ink-soft); flex:none;}
+  .noticerow-head.was-alert .tag{background:var(--alert);}
+  .noticerow-head .title{flex:1; font-size:14px; font-weight:700;}
+  .noticerow-head .date{font-size:12px; color:var(--ink-soft); flex:none;}
+  .noticerow-head .caret{color:var(--ink-soft); transition:transform .15s ease; flex:none;}
+  .noticerow-head[aria-expanded="true"] .caret{transform:rotate(180deg);}
+  .noticerow-body{max-height:0; overflow:hidden; transition:max-height .18s ease;}
+  .noticerow-body .inner{padding:0 14px 14px; font-size:13.5px; line-height:1.5; color:var(--ink-soft);}
+
+  /* Discussion list */
+  .postlist{margin:6px 16px 0;}
+  .postcard{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:10px; cursor:pointer;}
+  .postcard:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  .postcard h3{margin:0 0 5px; font-size:15.5px; font-weight:800; line-height:1.3;}
+  .postcard .preview{margin:0; font-size:13.5px; line-height:1.5; color:var(--ink-soft); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .postcard .meta{margin-top:8px; font-size:12px; color:var(--ink-soft); display:flex; gap:10px;}
+
+  /* Post detail */
+  .post{margin:6px 16px 0; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .post h2{margin:0 0 8px; font-size:17px; font-weight:800; line-height:1.3;}
+  .post p{margin:0; font-size:14.5px; line-height:1.55;}
+  .post-meta{margin-top:10px; font-size:12px; color:var(--ink-soft);}
+
+  .comments{margin:10px 16px 0; padding-bottom:6px;}
+  .comment{display:flex; gap:10px; padding:12px 4px; border-bottom:1px solid var(--line);}
+  .comment:last-child{border-bottom:none;}
+  .votecol{display:flex; flex-direction:column; align-items:center; gap:2px; padding-top:2px; flex:none;}
+  .votebtn{background:none; border:none; cursor:pointer; padding:3px; line-height:0; color:var(--ink-soft); border-radius:5px;}
+  .votebtn:hover{background:var(--brand-tint);}
+  .votebtn.on-up{color:var(--up);} .votebtn.on-down{color:var(--down);}
+  .votebtn:focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
+  .score{font-size:12.5px; font-weight:700;}
+  .commbody{flex:1; min-width:0;}
+  .commbody .author{font-size:13.5px; font-weight:700;}
+  .commbody .date{font-size:11.5px; color:var(--ink-soft); font-weight:500; margin-left:6px;}
+  .commbody .text{font-size:14px; line-height:1.5; margin:3px 0 6px;}
+  .commbody .actions{display:flex; gap:14px;}
+  .linklike{background:none; border:none; padding:0; font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer;}
+  .linklike:hover{color:var(--brand);}
+  .replybox{display:none; margin-top:8px; gap:8px; flex-direction:column;}
+  .replybox.open{display:flex;}
+  .replybox textarea{resize:vertical; min-height:54px; border:1px solid var(--line); border-radius:7px; padding:8px 10px; font-size:13.5px; font-family:inherit; background:var(--paper); color:var(--ink);}
+  .replybox .row{display:flex; gap:8px; justify-content:flex-end;}
+  .btn-mini{border:1px solid var(--line); background:var(--card); color:var(--ink); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:6px; cursor:pointer;}
+  .btn-mini.primary{background:var(--brand); border-color:var(--brand); color:#fff;}
+  .replies{margin-top:10px; padding-left:14px; border-left:2px solid var(--line);}
+
+  .newcomment{margin:0 16px 28px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px;}
+  .newcomment textarea{width:100%; border:1px solid var(--line); border-radius:7px; padding:10px 12px; font-size:14px; font-family:inherit; min-height:64px; resize:vertical; background:var(--paper); color:var(--ink);}
+  .newcomment .row{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+  .newcomment .hint{font-size:12px; color:var(--ink-soft);}
+
+  .tabbar{display:flex; justify-content:center; padding:14px 0 calc(18px + env(safe-area-inset-bottom,0px));}
+  .tabbar .dot{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--ink-soft);}
+</style>
+</head>
+<body>
+<div class="frame" id="app"></div>
+
+<script>
+const STORE_KEY = "residents_app_state_v9";
+
+function seed(){
+  return {
+    activeNoticeRead: false,
+    notices: [
+      { id:"n-flood", title:"Emergency Alert — Elizabeth Street flooding", date:"12min ago",
+        body:"Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk. Stay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route.", wasAlert:true },
+      { id:"n-drain", title:"Flood Warning — drains overflowing at Lonsdale & Elizabeth Street", date:"1d ago",
+        body:"SES has issued a Flood Warning for stormwater drains overflowing at the corner of Lonsdale Street and Elizabeth Street. Water may pool at building entrances and footpaths in the immediate area. Avoid the corner until crews clear the blockage.", wasAlert:false },
+      { id:"n-watch", title:"Flood Watch — Melbourne CBD, including Lonsdale & Elizabeth Street", date:"2d ago",
+        body:"SES has issued a Flood Watch for the Melbourne CBD catchment, including the Lonsdale Street and Elizabeth Street intersection. Heavy rainfall over the next 24 hours may lead to flash flooding right outside the building. Monitor conditions and be ready to act if a Flood Warning is issued.", wasAlert:false },
+      { id:"n-downgrade2", title:"Flood Warning downgraded — Elizabeth Street corner", date:"3d ago",
+        body:"SES has downgraded the Flood Warning for Elizabeth Street, including the Lonsdale Street corner, to a Flood Watch. Floodwater outside the building has begun to recede, but the footpath may still be affected. Continue to monitor VicEmergency for further updates.", wasAlert:false }
+    ],
+    posts: [
+      { id:"p-flood", title:"Elizabeth Street Flash Flooding Warning", date:"5min ago",
+        body:"Does anyone have any updates on the flash flooding situation and warning between Lonsdale Street and Bourke Street?",
+        comments:[
+          mkc("Resident A","The water near Bourke Street is getting deeper.","3min ago"),
+          mkc("Resident B","I just passed Lonsdale Street and it is still accessible.","2min ago"),
+          mkc("Resident C","The Bourke Street crossing looks unsafe. I would avoid it.","1min ago")
+        ]},
+      { id:"p-drain", title:"Drains overflowing right outside our building", date:"1d ago",
+        body:"Anyone else seeing the stormwater drains overflow at the corner of Lonsdale and Elizabeth? Water's pooling right by our entrance.",
+        comments:[
+          mkc("Resident D","Yeah, the grate outside the lobby is completely blocked.","23h ago"),
+          mkc("Resident E","Building manager's called it in to council.","22h ago")
+        ]},
+      { id:"p-watchvswarning", title:"What's the difference between a Flood Watch and a Flood Warning?", date:"2d ago",
+        body:"SES sent out a Flood Watch for the CBD, including our corner of Lonsdale and Elizabeth. Is that the same urgency as the Flood Warning we had for Elizabeth Street, or should I be less worried?",
+        comments:[
+          mkc("Resident F","A Watch means conditions could lead to flooding, a Warning means it's happening or imminent.","47h ago")
+        ]},
+      { id:"p-downgraded", title:"SES downgraded the warning for our corner — safe to go outside?", date:"3d ago",
+        body:"Just saw SES downgrade the Flood Warning to a Flood Watch for Elizabeth Street, right at our corner. Does that mean it's safe near the entrance again?",
+        comments:[
+          mkc("Resident G","Footpath's mostly dry now but still slippery near the door.","70h ago"),
+          mkc("Resident H","SES says continue monitoring, so I'd still be cautious.","69h ago")
+        ]}
+    ]
+  };
+}
+function mkc(author,text,date){ return {id:"c"+Math.random().toString(36).slice(2), author, text, date, up:0, down:0, myVote:0, replies:[]}; }
+
+function load(){
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return seed();
+}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+
+let state = load();
+let view = { screen:"home", postId:null };
+let expandedNotice = null;
+
+function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function score(c){ return c.up - c.down; }
+
+function markRead(){
+  state.activeNoticeRead = true;
+  save(); renderApp();
+}
+function markUnread(e){
+  if(e) e.stopPropagation();
+  state.activeNoticeRead = false;
+  expandedNotice = null;
+  save(); renderApp();
+  window.scrollTo(0,0);
+}
+
+function toggleNoticeRow(id){
+  expandedNotice = expandedNotice === id ? null : id;
+  renderApp();
+}
+
+function openPost(id){ view = {screen:"post", postId:id}; renderApp(); window.scrollTo(0,0); }
+function goHome(){ view = {screen:"home", postId:null}; renderApp(); window.scrollTo(0,0); }
+
+function findReplyList(list, path){
+  let cur = list;
+  for(const id of path){ const node = cur.find(x=>x.id===id); if(!node) return list; cur = node.replies; }
+  return cur;
+}
+function vote(postId, id, dir, path){
+  const post = state.posts.find(p=>p.id===postId);
+  const list = path.length ? findReplyList(post.comments, path) : post.comments;
+  const c = list.find(x=>x.id===id); if(!c) return;
+  if(c.myVote === dir){ if(dir===1) c.up--; else c.down--; c.myVote = 0; }
+  else{ if(c.myVote===1) c.up--; if(c.myVote===-1) c.down--; if(dir===1) c.up++; else c.down++; c.myVote = dir; }
+  save(); renderApp();
+}
+function toggleReply(id){ const box = document.getElementById("reply-"+id); if(box) box.classList.toggle("open"); }
+function submitReply(postId, id, path){
+  const ta = document.getElementById("reply-input-"+id);
+  const text = ta.value.trim(); if(!text) return;
+  const post = state.posts.find(p=>p.id===postId);
+  const list = path.length ? findReplyList(post.comments, path) : post.comments;
+  const parent = list.find(x=>x.id===id); if(!parent) return;
+  parent.replies.push(mkc("You", text, "now"));
+  save(); renderApp();
+}
+function addComment(postId){
+  const ta = document.getElementById("newText");
+  const text = ta.value.trim(); if(!text) return;
+  const post = state.posts.find(p=>p.id===postId);
+  post.comments.push(mkc("You", text, "now"));
+  save(); renderApp();
+}
+
+function renderComment(postId, c, path){
+  const fullPath = path.concat([c.id]);
+  const pathJson = JSON.stringify(path);
+  return `
+    <div class="comment">
+      <div class="votecol">
+        <button class="votebtn ${c.myVote===1?'on-up':''}" aria-label="Upvote" onclick='vote("${postId}","${c.id}",1,${pathJson})'>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 10h-5v6H9v-6H4z"/></svg>
+        </button>
+        <span class="score">${score(c)}</span>
+        <button class="votebtn ${c.myVote===-1?'on-down':''}" aria-label="Downvote" onclick='vote("${postId}","${c.id}",-1,${pathJson})'>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-10h5V4h6v6h5z"/></svg>
+        </button>
+      </div>
+      <div class="commbody">
+        <span class="author">${escapeHtml(c.author)}</span><span class="date">${escapeHtml(c.date)}</span>
+        <div class="text">${escapeHtml(c.text)}</div>
+        <div class="actions"><button class="linklike" onclick='toggleReply("${c.id}")'>Reply</button></div>
+        <div class="replybox" id="reply-${c.id}">
+          <textarea id="reply-input-${c.id}" placeholder="Write a reply…"></textarea>
+          <div class="row">
+            <button class="btn-mini" onclick='toggleReply("${c.id}")'>Cancel</button>
+            <button class="btn-mini primary" onclick='submitReply("${postId}","${c.id}",${pathJson})'>Reply</button>
+          </div>
+        </div>
+        ${c.replies.length ? `<div class="replies">${c.replies.map(r=>renderComment(postId, r, fullPath)).join("")}</div>` : ""}
+      </div>
+    </div>`;
+}
+
+function renderHome(){
+  const activeNotice = state.notices.find(n=>n.id==="n-flood");
+  const collapsedNotices = state.notices.filter(n => n.id !== "n-flood" || state.activeNoticeRead);
+
+  const activeHtml = state.activeNoticeRead ? "" : `
+    <div class="warning">
+      <div class="warning-head">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="who">Emergency Alert</span>
+      </div>
+      <div class="warning-sub"><span>From SES</span><span>${activeNotice.date}</span></div>
+      <div class="warning-body"><p>Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk.</p>
+      <p>Stay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route.</p></div>
+      <div class="warning-foot"><button class="btn-read" onclick="markRead()">Mark as read</button></div>
+    </div>`;
+
+  const rowsHtml = collapsedNotices.map(n => `
+    <div class="noticerow">
+      <button class="noticerow-head ${n.wasAlert?'was-alert':''}" aria-expanded="${expandedNotice===n.id}" onclick='toggleNoticeRow("${n.id}")'>
+        <span class="tag"></span>
+        <span class="title">${escapeHtml(n.title)}</span>
+        <span class="date">${escapeHtml(n.date)}</span>
+        <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="noticerow-body" style="max-height:${expandedNotice===n.id ? '320px' : '0'}">
+        <div class="inner">${escapeHtml(n.body)}
+        ${n.id==="n-flood" ? `<div style="margin-top:10px;"><button class="btn-mini" onclick='markUnread(event)'>Mark as unread</button></div>` : ""}
+        </div>
+      </div>
+    </div>`).join("");
+
+  const postsHtml = state.posts.map(p => `
+    <div class="postcard" tabindex="0" role="button" onclick='openPost("${p.id}")' onkeypress='if(event.key==="Enter") openPost("${p.id}")'>
+      <h3>${escapeHtml(p.title)}</h3>
+      <p class="preview">${escapeHtml(p.body)}</p>
+      <div class="meta"><span>${p.comments.length} comments</span><span>${escapeHtml(p.date)}</span></div>
+    </div>`).join("");
+
+  return `
+    <div class="section-label" style="padding-top:calc(20px + env(safe-area-inset-top,0px));">Community Notice</div>
+    ${activeHtml}
+    <div class="noticelist">${rowsHtml}</div>
+    <div class="section-label">Discussion Space</div>
+    <div class="postlist">${postsHtml}</div>
+    <div class="tabbar"><div class="dot"></div></div>
+  `;
+}
+
+function renderPost(id){
+  const p = state.posts.find(x=>x.id===id);
+  const sorted = [...p.comments].sort((a,b)=>score(b)-score(a));
+  return `
+    <div class="topbar">
+      <button class="backbtn" onclick="goHome()" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1>Discussion</h1>
+    </div>
+    <div class="post">
+      <h2>${escapeHtml(p.title)}</h2>
+      <p>${escapeHtml(p.body)}</p>
+      <div class="post-meta">Posted by a resident · ${escapeHtml(p.date)}</div>
+    </div>
+    <div class="comments">${sorted.map(c=>renderComment(p.id, c, [])).join("")}</div>
+    <div class="newcomment">
+      <textarea id="newText" placeholder="Share an update…"></textarea>
+      <div class="row"><span class="hint">Visible to other residents on this device</span>
+      <button class="btn-mini primary" onclick='addComment("${p.id}")'>Comment</button></div>
+    </div>
+    <div class="tabbar"><div class="dot"></div></div>
+  `;
+}
+
+function renderApp(){
+  document.getElementById("app").innerHTML = view.screen === "post" ? renderPost(view.postId) : renderHome();
+}
+renderApp();
+</script>
+</body>
+</html>
