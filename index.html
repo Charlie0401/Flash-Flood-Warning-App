@@ -313,7 +313,7 @@ function saveLang(l){ try{ localStorage.setItem(LANG_KEY, l); }catch(e){} }
 
 let state = load();
 let lang = loadLang();
-let view = { screen: lang ? "home" : "lang", postId:null };
+let view = { screen:"lang", postId:null };
 let expandedNotice = null;
 let translatedShown = new Set(); // ids currently showing ORIGINAL text (toggled off translation)
 
@@ -343,7 +343,7 @@ function t(){ return UI[lang] || UI.en; }
 function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function score(c){ return c.up - c.down; }
 
-function chooseLang(code){ lang = code; saveLang(code); view = {screen:"home", postId:null}; renderApp(); }
+function chooseLang(code){ lang = code; saveLang(code); state.activeNoticeRead = false; expandedNotice = null; save(); view = {screen:"home", postId:null}; renderApp(); }
 function goChangeLang(){ view = {screen:"lang", postId:null}; renderApp(); }
 function markRead(){ state.activeNoticeRead = true; save(); renderApp(); }
 function markUnread(e){ if(e) e.stopPropagation(); state.activeNoticeRead = false; expandedNotice = null; save(); renderApp(); window.scrollTo(0,0); }
