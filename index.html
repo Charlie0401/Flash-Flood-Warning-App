@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Residents</title>
+<title>Flood Notification System</title>
 <style>
   :root{
     --ink:#1B2430; --ink-soft:#4C5666; --paper:#F2EFE8; --card:#FFFFFF; --line:#DCD7CB;
@@ -16,31 +16,38 @@
   }
   :root[data-theme="dark"]{ --ink:#ECE7DC; --ink-soft:#B9B2A2; --paper:#181613; --card:#221F1A; --line:#38342C; --alert-tint:#301613; --brand-tint:#132A32; }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
-  body{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
-  .frame{max-width:460px;margin:0 auto;min-height:100vh;background:var(--paper); border-left:1px solid var(--line); border-right:1px solid var(--line);}
+  html,body{margin:0;padding:0;background:#DCD7CB;color:var(--ink);}
+  body{display:flex; justify-content:center; align-items:center; min-height:100vh; padding:24px; -webkit-font-smoothing:antialiased;}
+  .frame{width:390px; height:844px; margin:0 auto; background:var(--paper); border:1px solid var(--line); border-radius:34px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column;}
+  .screen{flex:1; overflow-y:auto; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 
-  .topbar{position:sticky; top:0; z-index:5; padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px; background:var(--paper); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
-  .topbar h1{margin:0; font-size:19px; font-weight:800; letter-spacing:.2px; flex:1;}
-  .backbtn{background:none; border:none; cursor:pointer; color:var(--ink); padding:2px; display:flex;}
-  .backbtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  /* Language screen */
+  .langwrap{padding:calc(48px + env(safe-area-inset-top,0px)) 22px 24px;}
+  .langwrap h1{font-size:24px; font-weight:800; margin:0 0 6px;}
+  .langwrap p{font-size:14px; color:var(--ink-soft); margin:0 0 22px;}
+  .langopt{display:block; width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; font-size:16px; font-weight:700; color:var(--ink); margin-bottom:10px; cursor:pointer;}
+  .langopt:hover{border-color:var(--brand);}
+  .langopt small{display:block; font-weight:500; font-size:12px; color:var(--ink-soft); margin-top:2px;}
+
+  .topbar{position:sticky; top:0; z-index:5; padding:calc(14px + env(safe-area-inset-top,0px)) 20px 12px; background:var(--paper); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
+  .topbar h1{margin:0; font-size:19px; font-weight:800; flex:1;}
+  .backbtn,.langbtn{background:none; border:none; cursor:pointer; color:var(--ink); padding:2px; display:flex; align-items:center; gap:5px; font-size:13px; font-weight:700;}
+  .backbtn:focus-visible,.langbtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
 
   .section-label{padding:20px 20px 6px; font-size:13px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
 
-  /* Active warning */
-  .warning{margin:10px 16px 4px; border-radius:10px; background:var(--alert-tint); border:1px solid var(--alert); overflow:hidden;}
-  .warning-head{display:flex; align-items:center; gap:10px; padding:14px 16px 10px; color:var(--alert);}
-  .warning-head .who{font-size:20px; font-weight:800; letter-spacing:.02em;}
-  .warning-sub{padding:0 16px 4px; font-size:12.5px; color:var(--ink-soft); font-weight:600; display:flex; justify-content:space-between;}
-  .warning-body{padding:6px 16px 16px; font-size:14.5px; line-height:1.55;}
-  .warning-body p{margin:0 0 10px;} .warning-body p:last-child{margin-bottom:0;}
-  .warning-foot{display:flex; justify-content:flex-end; padding:0 16px 14px;}
-  .btn-read{border:none; border-radius:7px; padding:8px 14px; font-size:13.5px; font-weight:700; background:var(--alert); color:#fff; cursor:pointer;}
-  .btn-read:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  .warning-head{display:flex; align-items:center; gap:10px; padding:16px 18px 10px; color:var(--alert);}
+  .warning-head .who{font-size:21px; font-weight:800;}
+  .warning-sub{padding:0 18px 4px; font-size:12.5px; color:var(--ink-soft); font-weight:600; display:flex; justify-content:space-between;}
+  .warning-body{padding:8px 18px 16px; font-size:14px; line-height:1.55; white-space:pre-line; flex:1;}
+  .warning-foot{display:flex; justify-content:flex-end; padding:0 18px 16px;}
+  .btn-read{border:none; border-radius:7px; padding:9px 16px; font-size:13.5px; font-weight:700; background:var(--alert); color:#fff; cursor:pointer;}
 
-  /* Collapsed notice rows */
-  .noticelist{margin:6px 16px 0;}
+  .noticebox{margin:6px 16px 0;}
+  .noticebox.is-unread{height:380px; display:flex; flex-direction:column;}
+  .noticelist{margin-top:0;}
+  .noticebox.is-unread .noticelist{flex:1; overflow-y:auto;}
+  .warning{margin:0; border-radius:12px; background:var(--alert-tint); border:1px solid var(--alert); overflow:hidden; flex:1; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(179,49,31,0.22);}
   .noticerow{background:var(--card); border:1px solid var(--line); border-radius:9px; margin-bottom:8px; overflow:hidden;}
   .noticerow-head{display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; background:none; border:none; width:100%; text-align:left; font:inherit; color:inherit;}
   .noticerow-head .tag{width:8px; height:8px; border-radius:50%; background:var(--ink-soft); flex:none;}
@@ -50,21 +57,21 @@
   .noticerow-head .caret{color:var(--ink-soft); transition:transform .15s ease; flex:none;}
   .noticerow-head[aria-expanded="true"] .caret{transform:rotate(180deg);}
   .noticerow-body{max-height:0; overflow:hidden; transition:max-height .18s ease;}
-  .noticerow-body .inner{padding:0 14px 14px; font-size:13.5px; line-height:1.5; color:var(--ink-soft);}
+  .noticerow-body .inner{padding:0 14px 14px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); white-space:pre-line;}
 
-  /* Discussion list */
-  .postlist{margin:6px 16px 0;}
+  .postlist{margin:6px 16px 0; max-height:420px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px; background:rgba(0,0,0,0.015);}
+  .postlist .postcard:last-child{margin-bottom:0;}
   .postcard{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:10px; cursor:pointer;}
-  .postcard:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
   .postcard h3{margin:0 0 5px; font-size:15.5px; font-weight:800; line-height:1.3;}
   .postcard .preview{margin:0; font-size:13.5px; line-height:1.5; color:var(--ink-soft); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  .postcard .meta{margin-top:8px; font-size:12px; color:var(--ink-soft); display:flex; gap:10px;}
+  .postcard .meta{margin-top:8px; font-size:12px; color:var(--ink-soft); display:flex; gap:10px; align-items:center;}
+  .xlate-badge{font-size:11px; font-weight:700; color:var(--brand); background:var(--brand-tint); border:none; border-radius:6px; padding:2px 7px; cursor:pointer; display:inline-flex; align-items:center; gap:3px;}
+  .xlate-badge.on{background:var(--brand); color:#fff;}
 
-  /* Post detail */
   .post{margin:6px 16px 0; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
   .post h2{margin:0 0 8px; font-size:17px; font-weight:800; line-height:1.3;}
   .post p{margin:0; font-size:14.5px; line-height:1.55;}
-  .post-meta{margin-top:10px; font-size:12px; color:var(--ink-soft);}
+  .post-meta{margin-top:10px; font-size:12px; color:var(--ink-soft); display:flex; gap:8px; align-items:center;}
 
   .comments{margin:10px 16px 0; padding-bottom:6px;}
   .comment{display:flex; gap:10px; padding:12px 4px; border-bottom:1px solid var(--line);}
@@ -73,7 +80,6 @@
   .votebtn{background:none; border:none; cursor:pointer; padding:3px; line-height:0; color:var(--ink-soft); border-radius:5px;}
   .votebtn:hover{background:var(--brand-tint);}
   .votebtn.on-up{color:var(--up);} .votebtn.on-down{color:var(--down);}
-  .votebtn:focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
   .score{font-size:12.5px; font-weight:700;}
   .commbody{flex:1; min-width:0;}
   .commbody .author{font-size:13.5px; font-weight:700;}
@@ -92,7 +98,7 @@
 
   .newcomment{margin:0 16px 28px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px;}
   .newcomment textarea{width:100%; border:1px solid var(--line); border-radius:7px; padding:10px 12px; font-size:14px; font-family:inherit; min-height:64px; resize:vertical; background:var(--paper); color:var(--ink);}
-  .newcomment .row{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+  .newcomment .row{display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:10px;}
   .newcomment .hint{font-size:12px; color:var(--ink-soft);}
 
   .tabbar{display:flex; justify-content:center; padding:14px 0 calc(18px + env(safe-area-inset-bottom,0px));}
@@ -100,92 +106,253 @@
 </style>
 </head>
 <body>
-<div class="frame" id="app"></div>
+<div class="frame"><div class="screen" id="app"></div></div>
 
 <script>
-const STORE_KEY = "residents_app_state_v9";
+const LANG_KEY = "residents_lang_v1";
+const STORE_KEY = "residents_app_state_v15";
+
+const LANGS = [
+  {code:"en", label:"English"},
+  {code:"zhHans", label:"简体中文", sub:"Simplified Chinese"},
+  {code:"zhHant", label:"繁體中文", sub:"Traditional Chinese"},
+  {code:"hi", label:"हिन्दी", sub:"Hindi"},
+  {code:"es", label:"Español", sub:"Spanish"}
+];
+
+const UI = {
+  en:{ notice:"Community Notice", discussion:"Discussion Space", who:"Emergency Alert", from:"From SES",
+    markRead:"Mark as read", markUnread:"Mark as unread", commentsWord:"comments", postedBy:"Posted by a resident",
+    shareUpdate:"Share an update…", writeReply:"Write a reply…", reply:"Reply", cancel:"Cancel", comment:"Comment",
+    visibleHint:"Visible to other residents on this device", changeLang:"Change language" },
+  zhHans:{ notice:"社区公告", discussion:"讨论区", who:"紧急警报", from:"来自SES",
+    markRead:"标记为已读", markUnread:"标记为未读", commentsWord:"条评论", postedBy:"由居民发布",
+    shareUpdate:"分享最新情况…", writeReply:"写下回复…", reply:"回复", cancel:"取消", comment:"评论",
+    visibleHint:"仅本设备上的居民可见", changeLang:"更改语言" },
+  zhHant:{ notice:"社區公告", discussion:"討論區", who:"緊急警報", from:"來自SES",
+    markRead:"標記為已讀", markUnread:"標記為未讀", commentsWord:"則留言", postedBy:"由居民發布",
+    shareUpdate:"分享最新情況…", writeReply:"寫下回覆…", reply:"回覆", cancel:"取消", comment:"留言",
+    visibleHint:"僅本裝置上的居民可見", changeLang:"更改語言" },
+  hi:{ notice:"सामुदायिक सूचना", discussion:"चर्चा स्थान", who:"आपातकालीन चेतावनी", from:"SES की ओर से",
+    markRead:"पढ़ा हुआ चिह्नित करें", markUnread:"अपठित चिह्नित करें", commentsWord:"टिप्पणियाँ", postedBy:"एक निवासी द्वारा पोस्ट किया गया",
+    shareUpdate:"एक अपडेट साझा करें…", writeReply:"जवाब लिखें…", reply:"जवाब दें", cancel:"रद्द करें", comment:"टिप्पणी करें",
+    visibleHint:"इस डिवाइस पर अन्य निवासियों को दिखेगा", changeLang:"भाषा बदलें" },
+  es:{ notice:"Aviso comunitario", discussion:"Espacio de discusión", who:"Alerta de emergencia", from:"De SES",
+    markRead:"Marcar como leído", markUnread:"Marcar como no leído", commentsWord:"comentarios", postedBy:"Publicado por un residente",
+    shareUpdate:"Comparte una actualización…", writeReply:"Escribe una respuesta…", reply:"Responder", cancel:"Cancelar", comment:"Comentar",
+    visibleHint:"Visible para otros residentes en este dispositivo", changeLang:"Cambiar idioma" }
+};
+
+const NOTICES_I18N = {
+  "n-flood":{
+    en:{ title:"Emergency Alert — Elizabeth Street flooding",
+      body:"Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk.\n\nStay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route." },
+    zhHans:{ title:"紧急警报 — 伊丽莎白街洪水",
+      body:"暴雨可能导致伊丽莎白街(朗斯代尔街与伯克街之间)发生山洪暴发。洪水可能影响该地区的住宅和道路,并危及您的生命。\n\n请保持警惕并关注VicEmergency的最新消息。请勿进入洪水中,并使用其他路线。" },
+    zhHant:{ title:"緊急警報 — 伊麗莎白街洪水",
+      body:"暴雨可能導致伊麗莎白街(朗斯代爾街與伯克街之間)發生山洪暴發。洪水可能影響該地區的住宅和道路,並危及您的生命。\n\n請保持警惕並關注VicEmergency的最新消息。請勿進入洪水中,並使用其他路線。" },
+    hi:{ title:"आपातकालीन चेतावनी — एलिज़ाबेथ स्ट्रीट में बाढ़",
+      body:"भारी बारिश के कारण एलिज़ाबेथ स्ट्रीट पर, लॉन्सडेल स्ट्रीट और बर्क स्ट्रीट के बीच, अचानक बाढ़ आ सकती है। बाढ़ का पानी इस क्षेत्र के घरों और सड़कों को प्रभावित कर सकता है, और आपकी जान को खतरे में डाल सकता है।\n\nसतर्क रहें और अपडेट के लिए VicEmergency पर नज़र रखें। बाढ़ के पानी में प्रवेश न करें और वैकल्पिक मार्ग का उपयोग करें।" },
+    es:{ title:"Alerta de emergencia — Inundación en Elizabeth Street",
+      body:"Las fuertes lluvias pueden causar inundaciones repentinas en Elizabeth Street, entre Lonsdale Street y Bourke Street. El agua de la inundación puede afectar viviendas y calles de la zona, y poner en riesgo su vida.\n\nManténgase alerta y consulte VicEmergency para obtener actualizaciones. No entre en el agua de la inundación y use una ruta alternativa." }
+  },
+  "n-drain":{
+    en:{ title:"Flood Warning — drains overflowing at Lonsdale & Elizabeth Street",
+      body:"SES has issued a Flood Warning for stormwater drains overflowing at the corner of Lonsdale Street and Elizabeth Street. Water may pool at building entrances and footpaths in the immediate area. Avoid the corner until crews clear the blockage." },
+    zhHans:{ title:"洪水警报 — 朗斯代尔街与伊丽莎白街排水沟溢出",
+      body:"SES已针对朗斯代尔街与伊丽莎白街转角处雨水排水沟溢出发布洪水警报。附近的建筑物入口和人行道可能会积水。在工作人员清除堵塞之前,请避开该转角。" },
+    zhHant:{ title:"洪水警報 — 朗斯代爾街與伊麗莎白街排水溝溢出",
+      body:"SES已針對朗斯代爾街與伊麗莎白街轉角處雨水排水溝溢出發布洪水警報。附近的建築物入口和人行道可能會積水。在工作人員清除堵塞之前,請避開該轉角。" },
+    hi:{ title:"बाढ़ चेतावनी — लॉन्सडेल और एलिज़ाबेथ स्ट्रीट पर नालियाँ उफान पर",
+      body:"SES ने लॉन्सडेल स्ट्रीट और एलिज़ाबेथ स्ट्रीट के कोने पर तूफानी जल निकासी नालियों के उफनने के लिए बाढ़ चेतावनी जारी की है। आसपास की इमारतों के प्रवेश द्वार और फुटपाथ पर पानी जमा हो सकता है। टीम द्वारा रुकावट साफ़ करने तक इस कोने से बचें।" },
+    es:{ title:"Alerta de inundación — desagües desbordados en Lonsdale y Elizabeth Street",
+      body:"SES ha emitido una alerta de inundación por el desbordamiento de los desagües pluviales en la esquina de Lonsdale Street y Elizabeth Street. El agua puede acumularse en las entradas de los edificios y en las aceras cercanas. Evite la esquina hasta que el personal despeje la obstrucción." }
+  },
+  "n-watch":{
+    en:{ title:"Flood Watch — Melbourne CBD, including Lonsdale & Elizabeth Street",
+      body:"SES has issued a Flood Watch for the Melbourne CBD catchment, including the Lonsdale Street and Elizabeth Street intersection. Heavy rainfall over the next 24 hours may lead to flash flooding right outside the building. Monitor conditions and be ready to act if a Flood Warning is issued." },
+    zhHans:{ title:"洪水观察 — 墨尔本中央商务区,包括朗斯代尔街与伊丽莎白街路口",
+      body:"SES已针对墨尔本中央商务区集水区(包括朗斯代尔街与伊丽莎白街路口)发布洪水观察。未来24小时内的强降雨可能导致建筑物外发生山洪暴发。请密切关注情况,并随时准备好应对洪水警报的发布。" },
+    zhHant:{ title:"洪水觀察 — 墨爾本中央商務區,包括朗斯代爾街與伊麗莎白街路口",
+      body:"SES已針對墨爾本中央商務區集水區(包括朗斯代爾街與伊麗莎白街路口)發布洪水觀察。未來24小時內的強降雨可能導致建築物外發生山洪暴發。請密切關注情況,並隨時準備好應對洪水警報的發布。" },
+    hi:{ title:"बाढ़ निगरानी — मेलबर्न सीबीडी, जिसमें लॉन्सडेल और एलिज़ाबेथ स्ट्रीट चौराहा शामिल है",
+      body:"SES ने मेलबर्न सीबीडी जलग्रहण क्षेत्र के लिए बाढ़ निगरानी जारी की है, जिसमें लॉन्सडेल स्ट्रीट और एलिज़ाबेथ स्ट्रीट का चौराहा भी शामिल है। अगले 24 घंटों में भारी बारिश से इमारत के ठीक बाहर अचानक बाढ़ आ सकती है। स्थिति पर नज़र रखें और बाढ़ चेतावनी जारी होने पर कार्रवाई के लिए तैयार रहें।" },
+    es:{ title:"Vigilancia de inundación — CBD de Melbourne, incluida la intersección de Lonsdale y Elizabeth Street",
+      body:"SES ha emitido una vigilancia de inundación para la cuenca del CBD de Melbourne, incluida la intersección de Lonsdale Street y Elizabeth Street. Las fuertes lluvias durante las próximas 24 horas podrían provocar inundaciones repentinas justo afuera del edificio. Controle la situación y esté listo para actuar si se emite una alerta de inundación." }
+  },
+  "n-downgrade2":{
+    en:{ title:"Flood Warning downgraded — Elizabeth Street corner",
+      body:"SES has downgraded the Flood Warning for Elizabeth Street, including the Lonsdale Street corner, to a Flood Watch. Floodwater outside the building has begun to recede, but the footpath may still be affected. Continue to monitor VicEmergency for further updates." },
+    zhHans:{ title:"洪水警报降级 — 伊丽莎白街转角",
+      body:"SES已将伊丽莎白街(包括朗斯代尔街转角)的洪水警报降级为洪水观察。建筑物外的洪水已开始消退,但人行道可能仍受影响。请继续关注VicEmergency的最新消息。" },
+    zhHant:{ title:"洪水警報降級 — 伊麗莎白街轉角",
+      body:"SES已將伊麗莎白街(包括朗斯代爾街轉角)的洪水警報降級為洪水觀察。建築物外的洪水已開始消退,但人行道可能仍受影響。請繼續關注VicEmergency的最新消息。" },
+    hi:{ title:"बाढ़ चेतावनी घटाई गई — एलिज़ाबेथ स्ट्रीट कोना",
+      body:"SES ने एलिज़ाबेथ स्ट्रीट (लॉन्सडेल स्ट्रीट कोने सहित) के लिए बाढ़ चेतावनी को घटाकर बाढ़ निगरानी कर दिया है। इमारत के बाहर का बाढ़ का पानी कम होना शुरू हो गया है, लेकिन फुटपाथ अभी भी प्रभावित हो सकता है। आगे के अपडेट के लिए VicEmergency पर नज़र रखना जारी रखें।" },
+    es:{ title:"Alerta de inundación reducida — esquina de Elizabeth Street",
+      body:"SES ha reducido la alerta de inundación de Elizabeth Street, incluida la esquina de Lonsdale Street, a una vigilancia de inundación. El agua de la inundación fuera del edificio ha comenzado a bajar, pero la acera aún puede estar afectada. Continúe consultando VicEmergency para más actualizaciones." }
+  }
+};
+
+function mkc(author,text,date){ return {id:"c"+Math.random().toString(36).slice(2), author, text, date, up:0, down:0, myVote:0, replies:[]}; }
+function mkcI18n(author,origLang,content,date){ return {id:"c"+Math.random().toString(36).slice(2), author, origLang, content, date, up:0, down:0, myVote:0, replies:[]}; }
 
 function seed(){
   return {
-    activeNoticeRead: false,
-    notices: [
-      { id:"n-flood", title:"Emergency Alert — Elizabeth Street flooding", date:"12min ago",
-        body:"Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk. Stay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route.", wasAlert:true },
-      { id:"n-drain", title:"Flood Warning — drains overflowing at Lonsdale & Elizabeth Street", date:"1d ago",
-        body:"SES has issued a Flood Warning for stormwater drains overflowing at the corner of Lonsdale Street and Elizabeth Street. Water may pool at building entrances and footpaths in the immediate area. Avoid the corner until crews clear the blockage.", wasAlert:false },
-      { id:"n-watch", title:"Flood Watch — Melbourne CBD, including Lonsdale & Elizabeth Street", date:"2d ago",
-        body:"SES has issued a Flood Watch for the Melbourne CBD catchment, including the Lonsdale Street and Elizabeth Street intersection. Heavy rainfall over the next 24 hours may lead to flash flooding right outside the building. Monitor conditions and be ready to act if a Flood Warning is issued.", wasAlert:false },
-      { id:"n-downgrade2", title:"Flood Warning downgraded — Elizabeth Street corner", date:"3d ago",
-        body:"SES has downgraded the Flood Warning for Elizabeth Street, including the Lonsdale Street corner, to a Flood Watch. Floodwater outside the building has begun to recede, but the footpath may still be affected. Continue to monitor VicEmergency for further updates.", wasAlert:false }
+    activeNoticeRead:false,
+    notices:[
+      {id:"n-flood", date:"12min ago", wasAlert:true},
+      {id:"n-drain", date:"1d ago", wasAlert:false},
+      {id:"n-watch", date:"2d ago", wasAlert:false},
+      {id:"n-downgrade2", date:"3d ago", wasAlert:false}
     ],
-    posts: [
-      { id:"p-flood", title:"Elizabeth Street Flash Flooding Warning", date:"5min ago",
-        body:"Does anyone have any updates on the flash flooding situation and warning between Lonsdale Street and Bourke Street?",
+    posts:[
+      { id:"p-flood", date:"5min ago", origLang:"en",
+        content:{
+          title:{ en:"Elizabeth Street Flash Flooding Warning",
+            zhHans:"伊丽莎白街山洪暴发警告", zhHant:"伊麗莎白街山洪暴發警告",
+            hi:"एलिज़ाबेथ स्ट्रीट फ्लैश फ्लडिंग चेतावनी", es:"Alerta de inundación repentina en Elizabeth Street" },
+          body:{ en:"Does anyone have any updates on the flash flooding situation and warning between Lonsdale Street and Bourke Street?",
+            zhHans:"有没有人知道朗斯代尔街和伯克街之间的山洪暴发情况和警告的最新消息?",
+            zhHant:"有沒有人知道朗斯代爾街和伯克街之間的山洪暴發情況和警告的最新消息?",
+            hi:"क्या किसी के पास लॉन्सडेल स्ट्रीट और बर्क स्ट्रीट के बीच फ्लैश फ्लडिंग की स्थिति और चेतावनी पर कोई अपडेट है?",
+            es:"¿Alguien tiene información actualizada sobre la inundación repentina y la alerta entre Lonsdale Street y Bourke Street?" }
+        },
         comments:[
-          mkc("Resident A","The water near Bourke Street is getting deeper.","3min ago"),
-          mkc("Resident B","I just passed Lonsdale Street and it is still accessible.","2min ago"),
-          mkc("Resident C","The Bourke Street crossing looks unsafe. I would avoid it.","1min ago")
+          mkcI18n("Resident A","en",{ text:{
+            en:"The water near Bourke Street is getting deeper.",
+            zhHans:"伯克街附近的水越来越深了。", zhHant:"伯克街附近的水越來越深了。",
+            hi:"बर्क स्ट्रीट के पास पानी और गहरा होता जा रहा है।",
+            es:"El agua cerca de Bourke Street cada vez está más profunda." } },"3min ago"),
+          mkcI18n("Resident B","hi",{ text:{
+            hi:"मैं अभी लॉन्सडेल स्ट्रीट से गुज़रा हूं, वहां अभी भी आना-जाना संभव है।",
+            en:"I just passed by Lonsdale Street, it's still possible to get through there.",
+            zhHans:"我刚经过朗斯代尔街,那里目前仍然可以通行。", zhHant:"我剛經過朗斯代爾街,那裡目前仍然可以通行。",
+            es:"Acabo de pasar por Lonsdale Street, todavía se puede transitar por ahí." } },"2min ago"),
+          mkcI18n("Resident C","zhHans",{ text:{
+            zhHans:"伯克街的人行横道看起来不安全,我不会走那边。",
+            en:"The Bourke Street crossing looks unsafe, I wouldn't go that way.",
+            zhHant:"伯克街的人行橫道看起來不安全,我不會走那邊。",
+            hi:"बर्क स्ट्रीट का क्रॉसिंग असुरक्षित लग रहा है, मैं उस तरफ नहीं जाऊंगा।",
+            es:"El cruce de Bourke Street parece inseguro, yo no iría por ahí." } },"1min ago")
         ]},
-      { id:"p-drain", title:"Drains overflowing right outside our building", date:"1d ago",
-        body:"Anyone else seeing the stormwater drains overflow at the corner of Lonsdale and Elizabeth? Water's pooling right by our entrance.",
+      { id:"p-drain", date:"1d ago", origLang:"es",
+        content:{
+          title:{ es:"Se están desbordando los desagües justo afuera de nuestro edificio",
+            en:"Drains overflowing right outside our building",
+            zhHans:"我们大楼外面的排水沟正在溢出", zhHant:"我們大樓外面的排水溝正在溢出",
+            hi:"हमारी इमारत के ठीक बाहर नालियाँ उफान पर हैं" },
+          body:{ es:"¿Alguien más ve que los desagües pluviales se desbordan en la esquina de Lonsdale y Elizabeth? El agua se está acumulando justo en la entrada.",
+            en:"Anyone else seeing the stormwater drains overflow at the corner of Lonsdale and Elizabeth? Water's pooling right by our entrance.",
+            zhHans:"还有人看到朗斯代尔街和伊丽莎白街转角的雨水排水沟溢出吗?水正好积在我们的入口处。",
+            zhHant:"還有人看到朗斯代爾街和伊麗莎白街轉角的雨水排水溝溢出嗎?水正好積在我們的入口處。",
+            hi:"क्या किसी और ने भी लॉन्सडेल और एलिज़ाबेथ के कोने पर तूफानी नालियों को उफनते देखा है? पानी हमारे प्रवेश द्वार के ठीक पास जमा हो रहा है।" }
+        },
         comments:[
-          mkc("Resident D","Yeah, the grate outside the lobby is completely blocked.","23h ago"),
-          mkc("Resident E","Building manager's called it in to council.","22h ago")
+          mkcI18n("Resident D","zhHans",{ text:{
+            zhHans:"大厅外面的排水格栅完全堵住了。", en:"Yeah, the grate outside the lobby is completely blocked.",
+            zhHant:"大廳外面的排水格柵完全堵住了。", hi:"हां, लॉबी के बाहर की जाली पूरी तरह से बंद हो गई है।",
+            es:"Sí, la rejilla afuera del vestíbulo está completamente bloqueada." } },"23h ago"),
+          mkcI18n("Resident E","en",{ text:{
+            en:"Building manager's called it in to council.",
+            zhHans:"大楼管理员已经向市议会报告了。", zhHant:"大樓管理員已經向市議會報告了。",
+            hi:"बिल्डिंग मैनेजर ने इसकी सूचना काउंसिल को दे दी है।",
+            es:"El administrador del edificio ya lo reportó al consejo municipal." } },"22h ago")
         ]},
-      { id:"p-watchvswarning", title:"What's the difference between a Flood Watch and a Flood Warning?", date:"2d ago",
-        body:"SES sent out a Flood Watch for the CBD, including our corner of Lonsdale and Elizabeth. Is that the same urgency as the Flood Warning we had for Elizabeth Street, or should I be less worried?",
+      { id:"p-watchvswarning", date:"2d ago", origLang:"hi",
+        content:{
+          title:{ hi:"फ्लड वॉच और फ्लड वार्निंग में क्या अंतर है?",
+            en:"What's the difference between a Flood Watch and a Flood Warning?",
+            zhHans:"洪水观察和洪水警报有什么区别?", zhHant:"洪水觀察和洪水警報有什麼區別?",
+            es:"¿Cuál es la diferencia entre una vigilancia de inundación y una alerta de inundación?" },
+          body:{ hi:"SES ने हमारे कोने सहित सीबीडी के लिए फ्लड वॉच जारी की है, जिसमें लॉन्सडेल और एलिज़ाबेथ का कोना भी शामिल है। क्या यह उतनी ही गंभीर स्थिति है जितनी एलिज़ाबेथ स्ट्रीट के लिए हमने पहले फ्लड वार्निंग में देखी थी, या मुझे कम चिंता करनी चाहिए?",
+            en:"SES sent out a Flood Watch for the CBD, including our corner of Lonsdale and Elizabeth. Is that the same urgency as the Flood Warning we had for Elizabeth Street, or should I be less worried?",
+            zhHans:"SES针对包括朗斯代尔与伊丽莎白转角在内的中央商务区发布了洪水观察。这和我们之前伊丽莎白街的洪水警报一样紧急吗,还是我可以不用那么担心?",
+            zhHant:"SES針對包括朗斯代爾與伊麗莎白轉角在內的中央商務區發布了洪水觀察。這和我們之前伊麗莎白街的洪水警報一樣緊急嗎,還是我可以不用那麼擔心?",
+            es:"SES emitió una vigilancia de inundación para el CBD, incluida nuestra esquina de Lonsdale y Elizabeth. ¿Es tan urgente como la alerta de inundación que tuvimos para Elizabeth Street, o debería preocuparme menos?" }
+        },
+        comments:[ mkcI18n("Resident F","es",{ text:{
+          es:"Una vigilancia significa que las condiciones podrían provocar inundaciones, una alerta significa que ya está ocurriendo o es inminente.",
+          en:"A Watch means conditions could lead to flooding, a Warning means it's happening or imminent.",
+          zhHans:"洪水观察意味着情况可能导致洪水,而洪水警报意味着洪水正在发生或即将发生。",
+          zhHant:"洪水觀察意味著情況可能導致洪水,而洪水警報意味著洪水正在發生或即將發生。",
+          hi:"वॉच का मतलब है कि हालात बाढ़ की ओर ले जा सकते हैं, वार्निंग का मतलब है कि यह हो रहा है या होने वाला है।" } },"47h ago") ]},
+      { id:"p-downgraded", date:"3d ago", origLang:"zhHant",
+        content:{
+          title:{ zhHant:"SES降低了我們轉角的警報 — 可以出門了嗎?",
+            en:"SES downgraded the warning for our corner — safe to go outside?",
+            zhHans:"SES降低了我们转角的警报 — 可以出门了吗?",
+            hi:"SES ने हमारे कोने की चेतावनी घटाई — क्या बाहर जाना सुरक्षित है?",
+            es:"SES redujo la alerta para nuestra esquina — ¿es seguro salir?" },
+          body:{ zhHant:"剛看到SES將伊麗莎白街(就在我們轉角)的洪水警報降級為洪水觀察。這代表入口附近又安全了嗎?",
+            en:"Just saw SES downgrade the Flood Warning to a Flood Watch for Elizabeth Street, right at our corner. Does that mean it's safe near the entrance again?",
+            zhHans:"刚看到SES将伊丽莎白街(就在我们转角)的洪水警报降级为洪水观察。这代表入口附近又安全了吗?",
+            hi:"अभी देखा कि SES ने एलिज़ाबेथ स्ट्रीट, ठीक हमारे कोने पर, फ्लड वार्निंग को घटाकर फ्लड वॉच कर दिया है। क्या इसका मतलब है कि प्रवेश द्वार के पास फिर से सुरक्षित है?",
+            es:"Acabo de ver que SES redujo la alerta de inundación a vigilancia para Elizabeth Street, justo en nuestra esquina. ¿Eso significa que está seguro otra vez cerca de la entrada?" }
+        },
         comments:[
-          mkc("Resident F","A Watch means conditions could lead to flooding, a Warning means it's happening or imminent.","47h ago")
-        ]},
-      { id:"p-downgraded", title:"SES downgraded the warning for our corner — safe to go outside?", date:"3d ago",
-        body:"Just saw SES downgrade the Flood Warning to a Flood Watch for Elizabeth Street, right at our corner. Does that mean it's safe near the entrance again?",
-        comments:[
-          mkc("Resident G","Footpath's mostly dry now but still slippery near the door.","70h ago"),
-          mkc("Resident H","SES says continue monitoring, so I'd still be cautious.","69h ago")
+          mkcI18n("Resident G","en",{ text:{
+            en:"Footpath's mostly dry now but still slippery near the door.",
+            zhHans:"人行道现在大多干了,但门口附近还是有点滑。", zhHant:"人行道現在大多乾了,但門口附近還是有點滑。",
+            hi:"फुटपाथ अब ज़्यादातर सूखा है, लेकिन दरवाज़े के पास अभी भी फिसलन है।",
+            es:"La acera ya está casi seca, pero todavía resbala cerca de la puerta." } },"70h ago"),
+          mkcI18n("Resident H","zhHans",{ text:{
+            zhHans:"SES说要继续关注,所以我还是会小心一点。",
+            en:"SES says continue monitoring, so I'd still be cautious.",
+            zhHant:"SES說要繼續關注,所以我還是會小心一點。",
+            hi:"SES का कहना है कि निगरानी जारी रखें, इसलिए मैं अभी भी सतर्क रहूंगा।",
+            es:"SES dice que sigamos monitoreando, así que yo seguiría con cuidado." } },"69h ago")
         ]}
     ]
   };
 }
-function mkc(author,text,date){ return {id:"c"+Math.random().toString(36).slice(2), author, text, date, up:0, down:0, myVote:0, replies:[]}; }
 
-function load(){
-  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
-  return seed();
-}
+function load(){ try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){} return seed(); }
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadLang(){ try{ return localStorage.getItem(LANG_KEY); }catch(e){ return null; } }
+function saveLang(l){ try{ localStorage.setItem(LANG_KEY, l); }catch(e){} }
 
 let state = load();
-let view = { screen:"home", postId:null };
+let lang = loadLang();
+let view = { screen: lang ? "home" : "lang", postId:null };
 let expandedNotice = null;
+let translatedShown = new Set(); // ids currently showing ORIGINAL text (toggled off translation)
 
+function toggleOriginal(id, e){ if(e) e.stopPropagation(); if(translatedShown.has(id)) translatedShown.delete(id); else translatedShown.add(id); renderApp(); }
+
+function postHasTranslation(p){ return !!(p.content && p.origLang !== lang && p.content.title[lang]); }
+function getPostField(p, field){
+  if(!p.content) return p[field];
+  const dict = p.content[field];
+  if(lang === p.origLang) return dict[p.origLang];
+  if(!dict[lang]) return dict[p.origLang];
+  return translatedShown.has(p.id) ? dict[p.origLang] : dict[lang];
+}
+function commentHasTranslation(c){ return !!(c.content && c.origLang !== lang && c.content.text[lang]); }
+function getCommentField(c){
+  if(!c.content) return c.text;
+  const dict = c.content.text;
+  if(lang === c.origLang) return dict[c.origLang];
+  if(!dict[lang]) return dict[c.origLang];
+  return translatedShown.has(c.id) ? dict[c.origLang] : dict[lang];
+}
+function xlateBadge(id, isOn){
+  return `<button class="xlate-badge ${isOn?'on':''}" onclick='toggleOriginal("${id}",event)' title="${isOn ? 'Show translation' : 'Show original'}">🌐</button>`;
+}
+
+function t(){ return UI[lang] || UI.en; }
 function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function score(c){ return c.up - c.down; }
 
-function markRead(){
-  state.activeNoticeRead = true;
-  save(); renderApp();
-}
-function markUnread(e){
-  if(e) e.stopPropagation();
-  state.activeNoticeRead = false;
-  expandedNotice = null;
-  save(); renderApp();
-  window.scrollTo(0,0);
-}
-
-function toggleNoticeRow(id){
-  expandedNotice = expandedNotice === id ? null : id;
-  renderApp();
-}
-
+function chooseLang(code){ lang = code; saveLang(code); view = {screen:"home", postId:null}; renderApp(); }
+function goChangeLang(){ view = {screen:"lang", postId:null}; renderApp(); }
+function markRead(){ state.activeNoticeRead = true; save(); renderApp(); }
+function markUnread(e){ if(e) e.stopPropagation(); state.activeNoticeRead = false; expandedNotice = null; save(); renderApp(); window.scrollTo(0,0); }
+function toggleNoticeRow(id){ expandedNotice = expandedNotice === id ? null : id; renderApp(); }
 function openPost(id){ view = {screen:"post", postId:id}; renderApp(); window.scrollTo(0,0); }
 function goHome(){ view = {screen:"home", postId:null}; renderApp(); window.scrollTo(0,0); }
 
-function findReplyList(list, path){
-  let cur = list;
-  for(const id of path){ const node = cur.find(x=>x.id===id); if(!node) return list; cur = node.replies; }
-  return cur;
-}
+function findReplyList(list, path){ let cur = list; for(const id of path){ const node = cur.find(x=>x.id===id); if(!node) return list; cur = node.replies; } return cur; }
 function vote(postId, id, dir, path){
   const post = state.posts.find(p=>p.id===postId);
   const list = path.length ? findReplyList(post.comments, path) : post.comments;
@@ -215,6 +382,7 @@ function addComment(postId){
 function renderComment(postId, c, path){
   const fullPath = path.concat([c.id]);
   const pathJson = JSON.stringify(path);
+  const s = t();
   return `
     <div class="comment">
       <div class="votecol">
@@ -228,13 +396,13 @@ function renderComment(postId, c, path){
       </div>
       <div class="commbody">
         <span class="author">${escapeHtml(c.author)}</span><span class="date">${escapeHtml(c.date)}</span>
-        <div class="text">${escapeHtml(c.text)}</div>
-        <div class="actions"><button class="linklike" onclick='toggleReply("${c.id}")'>Reply</button></div>
+        <div class="text">${escapeHtml(getCommentField(c))} ${commentHasTranslation(c) ? xlateBadge(c.id, translatedShown.has(c.id)) : ""}</div>
+        <div class="actions"><button class="linklike" onclick='toggleReply("${c.id}")'>${s.reply}</button></div>
         <div class="replybox" id="reply-${c.id}">
-          <textarea id="reply-input-${c.id}" placeholder="Write a reply…"></textarea>
+          <textarea id="reply-input-${c.id}" placeholder="${s.writeReply}"></textarea>
           <div class="row">
-            <button class="btn-mini" onclick='toggleReply("${c.id}")'>Cancel</button>
-            <button class="btn-mini primary" onclick='submitReply("${postId}","${c.id}",${pathJson})'>Reply</button>
+            <button class="btn-mini" onclick='toggleReply("${c.id}")'>${s.cancel}</button>
+            <button class="btn-mini primary" onclick='submitReply("${postId}","${c.id}",${pathJson})'>${s.reply}</button>
           </div>
         </div>
         ${c.replies.length ? `<div class="replies">${c.replies.map(r=>renderComment(postId, r, fullPath)).join("")}</div>` : ""}
@@ -242,55 +410,77 @@ function renderComment(postId, c, path){
     </div>`;
 }
 
+function renderLangScreen(){
+  return `
+    <div class="langwrap">
+      <h1>Flood Notification System</h1>
+      <p>Choose your language / 选择您的语言 / अपनी भाषा चुनें / Elige tu idioma</p>
+      ${LANGS.map(l => `<button class="langopt" onclick='chooseLang("${l.code}")'>${l.label}${l.sub ? `<small>${l.sub}</small>` : ""}</button>`).join("")}
+    </div>`;
+}
+
 function renderHome(){
-  const activeNotice = state.notices.find(n=>n.id==="n-flood");
-  const collapsedNotices = state.notices.filter(n => n.id !== "n-flood" || state.activeNoticeRead);
+  const s = t();
+  const activeNotice = NOTICES_I18N["n-flood"][lang] || NOTICES_I18N["n-flood"].en;
+  const activeMeta = state.notices.find(n=>n.id==="n-flood");
+  const collapsedNotices = state.activeNoticeRead ? state.notices : [];
 
   const activeHtml = state.activeNoticeRead ? "" : `
     <div class="warning">
       <div class="warning-head">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span class="who">Emergency Alert</span>
+        <span class="who">${s.who}</span>
       </div>
-      <div class="warning-sub"><span>From SES</span><span>${activeNotice.date}</span></div>
-      <div class="warning-body"><p>Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk.</p>
-      <p>Stay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route.</p></div>
-      <div class="warning-foot"><button class="btn-read" onclick="markRead()">Mark as read</button></div>
+      <div class="warning-sub"><span>${s.from}</span><span>${activeMeta.date}</span></div>
+      <div class="warning-body">${escapeHtml(activeNotice.body)}</div>
+      <div class="warning-foot"><button class="btn-read" onclick="markRead()">${s.markRead}</button></div>
     </div>`;
 
-  const rowsHtml = collapsedNotices.map(n => `
+  const rowsHtml = collapsedNotices.map(n => {
+    const tr = NOTICES_I18N[n.id][lang] || NOTICES_I18N[n.id].en;
+    return `
     <div class="noticerow">
       <button class="noticerow-head ${n.wasAlert?'was-alert':''}" aria-expanded="${expandedNotice===n.id}" onclick='toggleNoticeRow("${n.id}")'>
         <span class="tag"></span>
-        <span class="title">${escapeHtml(n.title)}</span>
+        <span class="title">${escapeHtml(tr.title)}</span>
         <span class="date">${escapeHtml(n.date)}</span>
         <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
       <div class="noticerow-body" style="max-height:${expandedNotice===n.id ? '320px' : '0'}">
-        <div class="inner">${escapeHtml(n.body)}
-        ${n.id==="n-flood" ? `<div style="margin-top:10px;"><button class="btn-mini" onclick='markUnread(event)'>Mark as unread</button></div>` : ""}
+        <div class="inner">${escapeHtml(tr.body)}
+        ${n.id==="n-flood" ? `<div style="margin-top:10px;"><button class="btn-mini" onclick='markUnread(event)'>${s.markUnread}</button></div>` : ""}
         </div>
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 
   const postsHtml = state.posts.map(p => `
     <div class="postcard" tabindex="0" role="button" onclick='openPost("${p.id}")' onkeypress='if(event.key==="Enter") openPost("${p.id}")'>
-      <h3>${escapeHtml(p.title)}</h3>
-      <p class="preview">${escapeHtml(p.body)}</p>
-      <div class="meta"><span>${p.comments.length} comments</span><span>${escapeHtml(p.date)}</span></div>
+      <h3>${escapeHtml(getPostField(p,"title"))} ${postHasTranslation(p) ? xlateBadge(p.id, translatedShown.has(p.id)) : ""}</h3>
+      <p class="preview">${escapeHtml(getPostField(p,"body"))}</p>
+      <div class="meta"><span>${p.comments.length} ${s.commentsWord}</span><span>${escapeHtml(p.date)}</span></div>
     </div>`).join("");
 
   return `
-    <div class="section-label" style="padding-top:calc(20px + env(safe-area-inset-top,0px));">Community Notice</div>
-    ${activeHtml}
-    <div class="noticelist">${rowsHtml}</div>
-    <div class="section-label">Discussion Space</div>
+    <div class="topbar" style="justify-content:flex-end;">
+      <button class="langbtn" onclick="goChangeLang()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+        ${s.changeLang}
+      </button>
+    </div>
+    <div class="section-label">${s.notice}</div>
+    <div class="noticebox ${state.activeNoticeRead ? '' : 'is-unread'}">
+      ${activeHtml}
+      ${rowsHtml ? `<div class="noticelist">${rowsHtml}</div>` : ""}
+    </div>
+    <div class="section-label">${s.discussion}</div>
     <div class="postlist">${postsHtml}</div>
     <div class="tabbar"><div class="dot"></div></div>
   `;
 }
 
 function renderPost(id){
+  const s = t();
   const p = state.posts.find(x=>x.id===id);
   const sorted = [...p.comments].sort((a,b)=>score(b)-score(a));
   return `
@@ -298,25 +488,28 @@ function renderPost(id){
       <button class="backbtn" onclick="goHome()" aria-label="Back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1>Discussion</h1>
+      <h1>${s.discussion}</h1>
     </div>
     <div class="post">
-      <h2>${escapeHtml(p.title)}</h2>
-      <p>${escapeHtml(p.body)}</p>
-      <div class="post-meta">Posted by a resident · ${escapeHtml(p.date)}</div>
+      <h2>${escapeHtml(getPostField(p,"title"))} ${postHasTranslation(p) ? xlateBadge(p.id, translatedShown.has(p.id)) : ""}</h2>
+      <p>${escapeHtml(getPostField(p,"body"))}</p>
+      <div class="post-meta"><span>${s.postedBy} · ${escapeHtml(p.date)}</span></div>
     </div>
     <div class="comments">${sorted.map(c=>renderComment(p.id, c, [])).join("")}</div>
     <div class="newcomment">
-      <textarea id="newText" placeholder="Share an update…"></textarea>
-      <div class="row"><span class="hint">Visible to other residents on this device</span>
-      <button class="btn-mini primary" onclick='addComment("${p.id}")'>Comment</button></div>
+      <textarea id="newText" placeholder="${s.shareUpdate}"></textarea>
+      <div class="row"><span class="hint">${s.visibleHint}</span>
+      <button class="btn-mini primary" onclick='addComment("${p.id}")'>${s.comment}</button></div>
     </div>
     <div class="tabbar"><div class="dot"></div></div>
   `;
 }
 
 function renderApp(){
-  document.getElementById("app").innerHTML = view.screen === "post" ? renderPost(view.postId) : renderHome();
+  const el = document.getElementById("app");
+  if(view.screen === "lang") el.innerHTML = renderLangScreen();
+  else if(view.screen === "post") el.innerHTML = renderPost(view.postId);
+  else el.innerHTML = renderHome();
 }
 renderApp();
 </script>
