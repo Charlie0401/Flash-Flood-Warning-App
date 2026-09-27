@@ -36,17 +36,15 @@
 
   .section-label{padding:20px 20px 6px; font-size:13px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
 
-  .warning-head{display:flex; align-items:center; gap:10px; padding:16px 18px 10px; color:var(--alert);}
-  .warning-head .who{font-size:21px; font-weight:800;}
+  .warning-head{display:flex; align-items:flex-start; gap:10px; padding:16px 18px 8px; color:var(--alert);}
+  .warning-head .who{font-size:16px; font-weight:800; line-height:1.3;}
   .warning-sub{padding:0 18px 4px; font-size:12.5px; color:var(--ink-soft); font-weight:600; display:flex; justify-content:space-between;}
-  .warning-body{padding:8px 18px 16px; font-size:14px; line-height:1.55; white-space:pre-line; flex:1;}
+  .warning-body{padding:8px 18px 16px; font-size:13.5px; line-height:1.55; white-space:pre-line; flex:1; overflow-y:auto;}
   .warning-foot{display:flex; justify-content:flex-end; padding:0 18px 16px;}
   .btn-read{border:none; border-radius:7px; padding:9px 16px; font-size:13.5px; font-weight:700; background:var(--alert); color:#fff; cursor:pointer;}
 
   .noticebox{margin:6px 16px 0;}
-  .noticebox.is-unread{height:380px; display:flex; flex-direction:column;}
   .noticelist{margin-top:0;}
-  .noticebox.is-unread .noticelist{flex:1; overflow-y:auto;}
   .warning{margin:0; border-radius:12px; background:var(--alert-tint); border:1px solid var(--alert); overflow:hidden; flex:1; display:flex; flex-direction:column; box-shadow:0 14px 30px rgba(179,49,31,0.22);}
   .noticerow{background:var(--card); border:1px solid var(--line); border-radius:9px; margin-bottom:8px; overflow:hidden;}
   .noticerow-head{display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; background:none; border:none; width:100%; text-align:left; font:inherit; color:inherit;}
@@ -57,6 +55,7 @@
   .noticerow-head .caret{color:var(--ink-soft); transition:transform .15s ease; flex:none;}
   .noticerow-head[aria-expanded="true"] .caret{transform:rotate(180deg);}
   .noticerow-body{max-height:0; overflow:hidden; transition:max-height .18s ease;}
+  .noticerow-body.open{max-height:340px; overflow-y:auto;}
   .noticerow-body .inner{padding:0 14px 14px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); white-space:pre-line;}
 
   .postlist{margin:6px 16px 0; max-height:420px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px; background:rgba(0,0,0,0.015);}
@@ -110,7 +109,7 @@
 
 <script>
 const LANG_KEY = "residents_lang_v1";
-const STORE_KEY = "residents_app_state_v15";
+const STORE_KEY = "residents_app_state_v17";
 
 const LANGS = [
   {code:"en", label:"English"},
@@ -145,16 +144,16 @@ const UI = {
 
 const NOTICES_I18N = {
   "n-flood":{
-    en:{ title:"Emergency Alert — Elizabeth Street flooding",
-      body:"Heavy rainfall may cause flash flooding in Elizabeth Street, between Lonsdale Street and Bourke Street. Floodwater may impact homes and roads in this area, and put your life at risk.\n\nStay alert and monitor VicEmergency for updates. Do not enter floodwater and use an alternative route." },
-    zhHans:{ title:"紧急警报 — 伊丽莎白街洪水",
-      body:"暴雨可能导致伊丽莎白街(朗斯代尔街与伯克街之间)发生山洪暴发。洪水可能影响该地区的住宅和道路,并危及您的生命。\n\n请保持警惕并关注VicEmergency的最新消息。请勿进入洪水中,并使用其他路线。" },
-    zhHant:{ title:"緊急警報 — 伊麗莎白街洪水",
-      body:"暴雨可能導致伊麗莎白街(朗斯代爾街與伯克街之間)發生山洪暴發。洪水可能影響該地區的住宅和道路,並危及您的生命。\n\n請保持警惕並關注VicEmergency的最新消息。請勿進入洪水中,並使用其他路線。" },
-    hi:{ title:"आपातकालीन चेतावनी — एलिज़ाबेथ स्ट्रीट में बाढ़",
-      body:"भारी बारिश के कारण एलिज़ाबेथ स्ट्रीट पर, लॉन्सडेल स्ट्रीट और बर्क स्ट्रीट के बीच, अचानक बाढ़ आ सकती है। बाढ़ का पानी इस क्षेत्र के घरों और सड़कों को प्रभावित कर सकता है, और आपकी जान को खतरे में डाल सकता है।\n\nसतर्क रहें और अपडेट के लिए VicEmergency पर नज़र रखें। बाढ़ के पानी में प्रवेश न करें और वैकल्पिक मार्ग का उपयोग करें।" },
-    es:{ title:"Alerta de emergencia — Inundación en Elizabeth Street",
-      body:"Las fuertes lluvias pueden causar inundaciones repentinas en Elizabeth Street, entre Lonsdale Street y Bourke Street. El agua de la inundación puede afectar viviendas y calles de la zona, y poner en riesgo su vida.\n\nManténgase alerta y consulte VicEmergency para obtener actualizaciones. No entre en el agua de la inundación y use una ruta alternativa." }
+    en:{ title:"WATCH & ACT - FLASH FLOOD - Stay Indoors",
+      body:"Incident Location: Elizabeth Street, Melbourne CBD\nIssue Date: Monday 21 November 2022, 09:50 am\n\nThis Flash Flood Watch and Act is being issued for Elizabeth Street, Melbourne CBD.\n\n- Heavy rainfall overnight has caused flash flooding in Elizabeth Street.\n- Roads currently impacted by floodwater, along Elizabeth Street, include Lonsdale Street and Bourke Street.\n- City of Melbourne Council have opened a relief centre due to some houses being isolated by floodwater at Melbourne Exhibition Centre at South Wharf VIC 3006.\n- You can stay safe by avoiding flooded and low-lying areas.\n- Floodwater can be very deep, rise quickly and move fast.\n- Be aware that heavy rainfall may also increase the potential for debris across roads.\n\nIf you are located along Elizabeth Street, you are in danger. You should immediately move indoors, away from floodwater. Do not enter floodwater." },
+    zhHans:{ title:"警戒与行动 - 山洪暴发 - 请留在室内",
+      body:"事发地点:墨尔本中央商务区伊丽莎白街\n发布时间:2022年11月21日星期一上午9:50\n\n针对墨尔本中央商务区伊丽莎白街发布本次山洪暴发警戒与行动通知。\n\n- 一夜的强降雨已导致伊丽莎白街发生山洪暴发。\n- 目前受洪水影响的道路,沿伊丽莎白街,包括朗斯代尔街和伯克街。\n- 由于部分住宅被洪水围困,墨尔本市议会已在南码头(邮编3006)的墨尔本会展中心开设了临时安置中心。\n- 请避开被淹没和低洼地区,以确保自身安全。\n- 洪水可能非常深,并会迅速上涨、快速流动。\n- 请注意,强降雨也可能增加道路上出现障碍物的风险。\n\n如果您位于伊丽莎白街一带,您正处于危险之中。请立即转移到室内,远离洪水,切勿进入洪水中。" },
+    zhHant:{ title:"警戒與行動 - 山洪暴發 - 請留在室內",
+      body:"事發地點:墨爾本中央商務區伊麗莎白街\n發布時間:2022年11月21日星期一上午9:50\n\n針對墨爾本中央商務區伊麗莎白街發布本次山洪暴發警戒與行動通知。\n\n- 一夜的強降雨已導致伊麗莎白街發生山洪暴發。\n- 目前受洪水影響的道路,沿伊麗莎白街,包括朗斯代爾街和伯克街。\n- 由於部分住宅被洪水圍困,墨爾本市議會已在南碼頭(郵遞區號3006)的墨爾本會展中心開設了臨時安置中心。\n- 請避開被淹沒和低窪地區,以確保自身安全。\n- 洪水可能非常深,並會迅速上漲、快速流動。\n- 請注意,強降雨也可能增加道路上出現障礙物的風險。\n\n如果您位於伊麗莎白街一帶,您正處於危險之中。請立即轉移到室內,遠離洪水,切勿進入洪水中。" },
+    hi:{ title:"चेतावनी और कार्रवाई - अचानक बाढ़ - घर के अंदर रहें",
+      body:"घटना स्थान: एलिज़ाबेथ स्ट्रीट, मेलबर्न सीबीडी\nजारी करने की तिथि: सोमवार, 21 नवंबर 2022, सुबह 09:50 बजे\n\nयह फ्लैश फ्लड वॉच एंड एक्ट एलिज़ाबेथ स्ट्रीट, मेलबर्न सीबीडी के लिए जारी किया जा रहा है।\n\n- रात भर हुई भारी बारिश के कारण एलिज़ाबेथ स्ट्रीट में अचानक बाढ़ आ गई है।\n- एलिज़ाबेथ स्ट्रीट के साथ-साथ फिलहाल बाढ़ के पानी से प्रभावित सड़कों में लॉन्सडेल स्ट्रीट और बर्क स्ट्रीट शामिल हैं।\n- कुछ घरों के बाढ़ के पानी से घिर जाने के कारण सिटी ऑफ मेलबर्न काउंसिल ने साउथ वार्फ, वीआईसी 3006 स्थित मेलबर्न एग्ज़िबिशन सेंटर में एक राहत केंद्र खोला है।\n- बाढ़ग्रस्त और निचले इलाकों से दूर रहकर आप सुरक्षित रह सकते हैं।\n- बाढ़ का पानी बहुत गहरा हो सकता है, और तेज़ी से बढ़ और बह सकता है।\n- ध्यान रखें कि भारी बारिश से सड़कों पर मलबा आने की संभावना भी बढ़ सकती है।\n\nयदि आप एलिज़ाबेथ स्ट्रीट के आस-पास हैं, तो आप खतरे में हैं। आपको तुरंत घर के अंदर, बाढ़ के पानी से दूर चले जाना चाहिए। बाढ़ के पानी में प्रवेश न करें।" },
+    es:{ title:"Vigile y Actúe - Inundación Repentina - Permanezca en Interiores",
+      body:"Ubicación del incidente: Elizabeth Street, CBD de Melbourne\nFecha de emisión: lunes 21 de noviembre de 2022, 09:50 am\n\nSe emite esta alerta de Vigile y Actúe por inundación repentina para Elizabeth Street, CBD de Melbourne.\n\n- Las fuertes lluvias durante la noche han causado inundaciones repentinas en Elizabeth Street.\n- Las calles actualmente afectadas por el agua de la inundación, a lo largo de Elizabeth Street, incluyen Lonsdale Street y Bourke Street.\n- El Concejo de la Ciudad de Melbourne ha abierto un centro de asistencia debido a que algunas viviendas quedaron aisladas por el agua, en el Melbourne Exhibition Centre, South Wharf VIC 3006.\n- Puede mantenerse a salvo evitando las zonas inundadas y las áreas bajas.\n- El agua de la inundación puede ser muy profunda, subir rápidamente y moverse con fuerza.\n- Tenga en cuenta que las fuertes lluvias también pueden aumentar la presencia de escombros en las calles.\n\nSi se encuentra en Elizabeth Street, está en peligro. Debe trasladarse de inmediato a un lugar cerrado, lejos del agua de la inundación. No entre en el agua de la inundación." }
   },
   "n-drain":{
     en:{ title:"Flood Warning — drains overflowing at Lonsdale & Elizabeth Street",
@@ -429,9 +428,8 @@ function renderHome(){
     <div class="warning">
       <div class="warning-head">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span class="who">${s.who}</span>
+        <span class="who">${escapeHtml(activeNotice.title)}</span>
       </div>
-      <div class="warning-sub"><span>${s.from}</span><span>${activeMeta.date}</span></div>
       <div class="warning-body">${escapeHtml(activeNotice.body)}</div>
       <div class="warning-foot"><button class="btn-read" onclick="markRead()">${s.markRead}</button></div>
     </div>`;
@@ -446,7 +444,7 @@ function renderHome(){
         <span class="date">${escapeHtml(n.date)}</span>
         <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
-      <div class="noticerow-body" style="max-height:${expandedNotice===n.id ? '320px' : '0'}">
+      <div class="noticerow-body ${expandedNotice===n.id ? 'open' : ''}">
         <div class="inner">${escapeHtml(tr.body)}
         ${n.id==="n-flood" ? `<div style="margin-top:10px;"><button class="btn-mini" onclick='markUnread(event)'>${s.markUnread}</button></div>` : ""}
         </div>
